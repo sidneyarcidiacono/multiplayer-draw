@@ -1,18 +1,19 @@
 const express = require('express')
 
 const app = express()
-const server = app.listen(3000)
+const server = app.listen(process.env.PORT || 3000)
+const io = require('socket.io')(server)
 
 app.use(express.static('public'))
 
+app.get('/', (request, response) => {
+  response.sendFile(__dirname + '/views/index.html')
+})
+
+io.on('connection', socket => {
+  socket.on('mouse', data => {
+    socket.broadcast.emit('mouse', data)
+  })
+})
 console.log('My socket server is running')
 
-const socket = require('socket.io')
-
-const io = socket(server)
-
-io.sockets.on('connection', newConnection)
-
-function newConnection (socket) {
-  console.log('new connection ' + socket.id)
-}
